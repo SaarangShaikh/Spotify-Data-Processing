@@ -1,6 +1,19 @@
 import json
 import math
 import time
+import tkinter as tk
+import ctypes
+ctypes.windll.shcore.SetProcessDpiAwareness(1)
+
+window = tk.Tk()
+window.tk.call('tk', 'scaling', 1.0) # Adjust the value as needed
+window.title("Spotify Data Analysis")
+window.geometry("600x600")
+window.configure(bg="black")
+window.resizable(False, False)
+
+label = tk.Label(window, text="Spotify Data Analysis", font=("Arial", 40), bg="black", fg="green")
+label.pack(pady=20)
 
 # File List
 file_paths = [
@@ -73,6 +86,15 @@ def firsttimetrack(track, artist):
                     return obj.get("ts", 0) #returns the timestamp of the first time the track was played
     return None
 
+def firsttimeartist(artist):
+    for file_path in file_paths:
+        json_data = read_json(file_path)
+        if json_data:
+            for obj in json_data:
+                if obj.get("master_metadata_album_artist_name", 0) == artist:
+                    return obj.get("ts", 0) #returns the timestamp of the first time the artist was played
+    return None
+
 def loading():
     for i in range(5):
         time.sleep(0.4)
@@ -80,7 +102,7 @@ def loading():
     time.sleep(0.4)
 
 if __name__ == "__main__":
-    choice = input("WHAT WOULD YOU LIKE TO DO?\n(1) CALCULATE TOTAL STREAMING TIME\n(2) CALCULATE NUMBER OF ARTISTS LISTENED TO\n(3) CALCULATE NUMBER OF TRACKS LISTENED TO\n(4) FIND THE FIRST TIME A TRACK WAS PLAYED\n(5) EXIT\n --> ")
+    choice = input("WHAT WOULD YOU LIKE TO DO?\n(1) CALCULATE TOTAL STREAMING TIME\n(2) CALCULATE NUMBER OF ARTISTS LISTENED TO\n(3) CALCULATE NUMBER OF TRACKS LISTENED TO\n(4) FIND THE FIRST TIME A TRACK WAS PLAYED\n(5) FIND THE FIRST TIME AN ARTIST WAS PLAYED\n(9) EXIT\n --> ")
     if choice == "1":
         print("CALCULATING TOTAL STREAMING TIME...")
         loading()
@@ -109,6 +131,15 @@ if __name__ == "__main__":
         else:
             print("TRACK NOT FOUND!")
     elif choice == "5":
+        artist = input("ENTER THE NAME OF THE ARTIST: ")
+        firsttime = firsttimeartist(artist)
+        print("FINDING THE FIRST TIME THAT ARTIST WAS PLAYED...")
+        loading()
+        if firsttime:
+            print("FIRST TIME PLAYED:", firsttime)
+        else:
+            print("ARTIST NOT FOUND!")
+    elif choice == "9":
         print("GOODBYE!")
         exit()
     else: 
