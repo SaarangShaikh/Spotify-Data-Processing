@@ -3,17 +3,15 @@ import math
 import time
 import tkinter as tk
 import ctypes
-ctypes.windll.shcore.SetProcessDpiAwareness(1)
 
+#window settings
+ctypes.windll.shcore.SetProcessDpiAwareness(1)
 window = tk.Tk()
 window.tk.call('tk', 'scaling', 1.0) # Adjust the value as needed
 window.title("Spotify Data Analysis")
 window.geometry("600x600")
 window.configure(bg="black")
 window.resizable(False, False)
-
-label = tk.Label(window, text="Spotify Data Analysis", font=("Arial", 40), bg="black", fg="green")
-label.pack(pady=20)
 
 # File List
 file_paths = [
@@ -36,6 +34,8 @@ def read_json(file_path):
     return None
 
 def streamtime():
+    print("CALCULATING TOTAL STREAMING TIME...")
+    loading()
     total = 0
     for file_path in file_paths:
         json_data = read_json(file_path)
@@ -45,7 +45,7 @@ def streamtime():
     total = total/60000 #converts the total from milliseconds to minutes
     totalInt = math.trunc(total) #converts the total to an integer
     totalDecimal = total - totalInt #gets the decimal part of the total
-    return totalInt, totalDecimal
+    print("TOTAL STREAMING TIME:", totalInt, "MINUTES AND", math.floor(totalDecimal*60), "SECONDS") #prints the total of all the ms_played values in the json file
 
 def artistlistened():
     initialartists = []
@@ -104,12 +104,7 @@ def loading():
 if __name__ == "__main__":
     choice = input("WHAT WOULD YOU LIKE TO DO?\n(1) CALCULATE TOTAL STREAMING TIME\n(2) CALCULATE NUMBER OF ARTISTS LISTENED TO\n(3) CALCULATE NUMBER OF TRACKS LISTENED TO\n(4) FIND THE FIRST TIME A TRACK WAS PLAYED\n(5) FIND THE FIRST TIME AN ARTIST WAS PLAYED\n(9) EXIT\n --> ")
     if choice == "1":
-        print("CALCULATING TOTAL STREAMING TIME...")
-        loading()
-        streamtime = streamtime()
-        totalInt = streamtime[0]
-        totalDecimal = streamtime[1]
-        print("TOTAL STREAMING TIME:", totalInt, "MINUTES AND", math.floor(totalDecimal*60), "SECONDS") #prints the total of all the ms_played values in the json file
+        streamtime()
     elif choice == "2":
         artists = artistlistened()
         print("CALCULATING NUMBER OF ARTISTS LISTENED TO...")
@@ -145,3 +140,9 @@ if __name__ == "__main__":
     else: 
         print("INVALID INPUT! PLEASE TRY AGAIN.")
         exit()
+
+label = tk.Label(window, text="Spotify Data Analysis", font=("Arial", 40), bg="black", fg="green")
+label.pack(pady=20)
+
+button1 = tk.Button(window, text="Calculate Total Streaming Time", font=("Arial", 20), bg="black", fg="green", command=lambda: streamtime())
+button1.pack(pady=10)
